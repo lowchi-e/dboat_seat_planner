@@ -17,7 +17,7 @@ export interface TeamMember {
   side?: "left" | "right" // actual assigned side
 }
 
-function encodeState(data: any) {
+function encodeState(data: TeamMember[]) {
   return encodeURIComponent(btoa(JSON.stringify(data)))
 }
 
@@ -94,7 +94,7 @@ useEffect(() => {
       setSeatedMembers((prev) =>
         prev.filter((member) => {
           if (member.position === 0 || member.position === 21) return true // Keep drummer and steerer
-          return member.position <= 10 // Keep only positions 1-10 (pairs 1-5)
+          return member?.position <= 10 // Keep only positions 1-10 (pairs 1-5)
         }),
       )
     }

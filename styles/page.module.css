@@ -200,10 +200,12 @@
   .plannerLayout {
     grid-template-columns: 1fr;
     gap: 1rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .sidePanel {
-    order: -1;
+    order: 2;
   }
 
   .actions {
@@ -220,12 +222,28 @@
   .tabs {
     margin: 0 -0.5rem 2rem -0.5rem;
   }
+
+  .boatSection {
+    order: 1;
+  }
+
+  .formSection {
+    order: 1;
+  }
+
+  .availableMembers {
+    order: 2;
+  }
 }
 
 @media (max-width: 480px) {
   .title {
     font-size: 1.5rem;
   }
+}
+
+.formSection {
+  margin-bottom: 1rem;
 }
 
 .weightSummary {
@@ -237,5 +255,5 @@
   margin-bottom: 16px;
   font-size: 14px;
   color: #333;
-  box-shadow: 0 0 4px rgba(0,0,0,0.05);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
 }

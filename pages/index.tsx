@@ -238,8 +238,11 @@ export default function DragonBoatSeatingPlan() {
                   boatSize={boatSize}
                 />
               </div>
+              
               <div className={styles.sidePanel}>
+                <div className={styles.formSection}>
                 <TeamMemberForm onAddMember={addTeamMember} />
+                </div>
                 <div className={styles.availableMembers}>
                   <h3>Available Members ({availableMembers.length})</h3>
                   <div className={styles.membersList}>

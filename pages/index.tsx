@@ -37,20 +37,20 @@ export default function DragonBoatSeatingPlan() {
   const [activeTab, setActiveTab] = useState<"planner" | "roster" | "stats">("planner")
   const [boatSize, setBoatSize] = useState<12 | 22>(22)
 
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search)
-  const teamData = params.get("team")
-  const seatedData = params.get("seated")
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const teamData = params.get("team")
+    const seatedData = params.get("seated")
 
-  if (teamData) {
-    const decodedTeam = decodeState(teamData)
-    setTeamMembers(decodedTeam)
-  }
-  if (seatedData) {
-    const decodedSeated = decodeState(seatedData)
-    setSeatedMembers(decodedSeated)
-  }
-}, [])
+    if (teamData) {
+      const decodedTeam = decodeState(teamData)
+      setTeamMembers(decodedTeam)
+    }
+    if (seatedData) {
+      const decodedSeated = decodeState(seatedData)
+      setSeatedMembers(decodedSeated)
+    }
+  }, [])
 
 
   const addTeamMember = (member: Omit<TeamMember, "id">) => {
@@ -139,6 +139,19 @@ useEffect(() => {
     setSeatedMembers(newSeatedMembers)
   }
 
+  // sum the weights on each side and the difference
+
+  const leftWeight = seatedMembers
+    .filter((m) => m.side === "left")
+    .reduce((sum, m) => sum + m.weight, 0)
+
+  const rightWeight = seatedMembers
+    .filter((m) => m.side === "right")
+    .reduce((sum, m) => sum + m.weight, 0)
+
+  const weightDifference = Math.abs(leftWeight - rightWeight)
+
+
   const availableMembers = teamMembers.filter((member) => !seatedMembers.find((seated) => seated.id === member.id))
 
   return (
@@ -190,50 +203,59 @@ useEffect(() => {
         </button>
       </div>
 
-<button
-  onClick={() => {
-    const teamEncoded = encodeState(teamMembers)
-    const seatedEncoded = encodeState(seatedMembers)
-    const baseUrl = `${window.location.origin}${window.location.pathname}`
-    const shareUrl = `${baseUrl}?team=${teamEncoded}&seated=${seatedEncoded}`
-    navigator.clipboard.writeText(shareUrl)
-    alert("Sharable URL copied to clipboard!")
-  }}
-  className={styles.secondaryButton}
->
-  Copy Shareable URL
-</button>
+      <button
+        onClick={() => {
+          const teamEncoded = encodeState(teamMembers)
+          const seatedEncoded = encodeState(seatedMembers)
+          const baseUrl = `${window.location.origin}${window.location.pathname}`
+          const shareUrl = `${baseUrl}?team=${teamEncoded}&seated=${seatedEncoded}`
+          navigator.clipboard.writeText(shareUrl)
+          alert("Sharable URL copied to clipboard!")
+        }}
+        className={styles.secondaryButton}
+      >
+        Copy Shareable URL
+      </button>
 
 
       <div className={styles.content}>
         {activeTab === "planner" && (
-          <div className={styles.plannerLayout}>
-            <div className={styles.boatSection}>
-              <BoatLayout
-                seatedMembers={seatedMembers}
-                teamMembers={teamMembers}
-                onAssignSeat={assignSeat}
-                onRemoveSeat={removeSeat}
-                boatSize={boatSize}
-              />
+          <>
+            <div className={styles.weightSummary}>
+              <p><strong>Left Weight:</strong> {leftWeight} kg</p>
+              <p><strong>Right Weight:</strong> {rightWeight} kg</p>
+              <p><strong>Difference:</strong> {weightDifference} kg</p>
             </div>
-            <div className={styles.sidePanel}>
-              <TeamMemberForm onAddMember={addTeamMember} />
-              <div className={styles.availableMembers}>
-                <h3>Available Members ({availableMembers.length})</h3>
-                <div className={styles.membersList}>
-                  {availableMembers.map((member) => (
-                    <div key={member.id} className={styles.memberCard}>
-                      <div className={styles.memberName}>{member.name}</div>
-                      <div className={styles.memberDetails}>
-                        {member.weight}kg • {member.sidePreference} • {member.experience}
+
+            <div className={styles.plannerLayout}>
+
+              <div className={styles.boatSection}>
+                <BoatLayout
+                  seatedMembers={seatedMembers}
+                  teamMembers={teamMembers}
+                  onAssignSeat={assignSeat}
+                  onRemoveSeat={removeSeat}
+                  boatSize={boatSize}
+                />
+              </div>
+              <div className={styles.sidePanel}>
+                <TeamMemberForm onAddMember={addTeamMember} />
+                <div className={styles.availableMembers}>
+                  <h3>Available Members ({availableMembers.length})</h3>
+                  <div className={styles.membersList}>
+                    {availableMembers.map((member) => (
+                      <div key={member.id} className={styles.memberCard}>
+                        <div className={styles.memberName}>{member.name}</div>
+                        <div className={styles.memberDetails}>
+                          {member.weight}kg • {member.sidePreference} • {member.experience}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {activeTab === "roster" && <TeamRoster teamMembers={teamMembers} onRemoveMember={removeTeamMember} />}
